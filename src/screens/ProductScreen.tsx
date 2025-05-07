@@ -1,19 +1,27 @@
-import React, { FC, useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, Alert } from 'react-native';
+import React, {FC, useEffect, useState} from 'react';
+import {View, Text, FlatList, Image, StyleSheet, Alert} from 'react-native';
 import API from '../services/api';
-import { Product } from '../types';
+import {Product} from '../types';
 
-const ProductScreen:FC = () => {
+const ProductScreen: FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   const fetchData = async () => {
     try {
-      const res = await API.post('products', {
+      const productList = await API.post('products', {
         tabType: 'delivery',
         store_id: '27bb8b72-d0e7-4da1-9bf0-58dc802931d7',
         category_id: '47c817e5-659b-4af3-8c5a-81ed50430711',
       });
-      setProducts(res.data.products || []);
+      console.log('productList', productList);
+      if (
+        productList?.data?.status_code == 200 &&
+        productList?.data?.message.includes(
+          'Successfully fetched products data',
+        )
+      ) {
+        setProducts(productList?.data?.data || []);
+      }
     } catch {
       Alert.alert('Failed to fetch products');
     }
@@ -23,9 +31,9 @@ const ProductScreen:FC = () => {
     fetchData();
   }, []);
 
-  const renderItem = ({ item }: { item: Product }) => (
+  const renderItem = ({item}: {item: Product}) => (
     <View style={styles.card}>
-      <Image source={{ uri: item.image_link }} style={styles.image} />
+      <Image source={{uri: item.image_link}} style={styles.image} />
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.desc}>{item.description}</Text>
       <Text style={styles.price}>₹ {item.delivery_price}</Text>
@@ -33,18 +41,20 @@ const ProductScreen:FC = () => {
   );
 
   return (
-    <FlatList
-      contentContainerStyle={styles.container}
-      data={products}
-      numColumns={2}
-      renderItem={renderItem}
-      keyExtractor={(_, i) => i.toString()}
-    />
+    <View style={{backgroundColor: 'red'}}>
+      <FlatList
+        contentContainerStyle={styles.container}
+        data={products}
+        numColumns={2}
+        renderItem={renderItem}
+        keyExtractor={(_, i) => i.toString()}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 10 },
+  container: {padding: 10},
   card: {
     backgroundColor: '#FFF1E6',
     borderRadius: 12,
@@ -53,10 +63,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  image: { width: 100, height: 100, borderRadius: 10 },
-  title: { fontWeight: 'bold', marginTop: 5 },
-  desc: { fontSize: 12, color: '#777' },
-  price: { marginTop: 5, color: '#F7931E', fontWeight: 'bold' },
+  image: {width: 100, height: 100, borderRadius: 10},
+  title: {fontWeight: 'bold', marginTop: 5},
+  desc: {fontSize: 12, color: '#777'},
+  price: {marginTop: 5, color: '#F7931E', fontWeight: 'bold'},
 });
 
 export default ProductScreen;

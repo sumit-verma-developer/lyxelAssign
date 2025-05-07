@@ -11,9 +11,13 @@ import {
 import API from '../services/api';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
-import {Colors, screenHeight, screenWidth} from '../utils/Constants';
+import {Colors, FONTS, screenHeight, screenWidth} from '../utils/Constants';
+import {RFValue} from 'react-native-responsive-fontsize';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Loader from '../commons/Loader';
+import {isValidPhoneNumber} from '../commons/isValidPhoneNumber';
 
-// ✅ Define RootStackParamList here
+//Define RootStackParamList 
 type RootStackParamList = {
   Login: undefined;
   OTP: {mobile: string};
@@ -28,13 +32,42 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 const LoginScreen: FC = () => {
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<{mobile?: string}>({});
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
+  const validate = () => {
+    let err: {mobile?: string} = {};
+    var valid = true;
+
+    if (!isValidPhoneNumber(mobile)) {
+      err.mobile = 'Enter a Valid Phone Number';
+      valid = false;
+    }
+    setError(err);
+    return valid;
+  };
+
   const handleLogin = async () => {
+    const valid = validate();
+    if (!valid) {
+      return;
+    }
     try {
       setLoading(true);
-      await API.post('login', {mobile});
-      navigation.navigate('OTP', {mobile});
+      let result = await API.post('login', {mobile});
+      console.log('result', result);
+      if (
+        result?.data?.status_code == 200 &&
+        result?.data?.message.includes('Your OTP Sent Successfully')
+      ) {
+        navigation.navigate('OTP', {mobile});
+      }
+      if (
+        result?.data?.status_code == 203 &&
+        result?.data?.error.includes('You’re not an islander, be One Now!')
+      ) {
+        Alert.alert(result?.data?.error);
+      }
     } catch (error) {
       Alert.alert('Failed to send OTP');
     } finally {
@@ -44,32 +77,48 @@ const LoginScreen: FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={{alignItems: 'center', flexWrap: 'wrap'}}>
-        <Image
-          source={require('../assets/images/logo.png')}
-          style={styles.image}
-        />
-        <Text style={styles.title}>WELCOME TO REACT-NATIVE WORLD</Text>
-      </View>
+      <>
+        <View style={{alignItems: 'center'}}>
+          <Image
+            source={require('../assets/images/logo.png')}
+            style={styles.image}
+          />
+          <Text style={styles.title}>WELCOME TO REACT-NATIVE WORLD</Text>
+        </View>
 
-      <View>
-        <Text style={styles.title}>Sign In</Text>
-        <TextInput
-          placeholder="Enter your mobile number..."
-          keyboardType="number-pad"
-          value={mobile}
-          onChangeText={setMobile}
-          style={styles.input}
-          placeholderTextColor={Colors.lightText}
-        />
-      </View>
+        <View>
+          <Text style={styles.label}>SIGN IN</Text>
+          <Text style={styles.subLabel}>
+            Hi! Welcome back, you’ve been missed
+          </Text>
+          <View style={styles.inputWrapper}>
+            <MaterialCommunityIcons
+              name="phone"
+              size={22}
+              color={Colors.placeholderColor}
+              style={styles.iconStyle}
+            />
+            <TextInput
+              placeholder="Enter your mobile number..."
+              keyboardType="number-pad"
+              value={mobile}
+              onChangeText={setMobile}
+              style={styles.inputWithIcon}
+              placeholderTextColor={Colors.placeholderColor}
+              maxLength={10}
+            />
+          </View>
+          {error?.mobile && <Text style={styles.err}>{error?.mobile}</Text>}
+        </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleLogin}
-        disabled={loading}>
-        <Text style={styles.buttonText}>PROCEED</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogin}
+          disabled={loading}>
+          <Text style={styles.buttonText}>PROCEED</Text>
+        </TouchableOpacity>
+      </>
+      <Loader loading={loading} />
     </View>
   );
 };
@@ -81,21 +130,70 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FAF1E6',
   },
-  title: {fontSize: 24, fontWeight: 'bold', marginBottom: 20},
-  input: {borderWidth: 1, padding: 15, borderRadius: 10, marginBottom: 20,
-    borderColor:''
+  title: {
+    fontSize: RFValue(18),
+    fontWeight: '600',
+    color: '#474747',
+    flexWrap: 'wrap',
+    alignSelf: 'center',
+    paddingLeft: 50,
+  },
+  label: {
+    fontSize: RFValue(16),
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: Colors.reddishbrown,
+    fontFamily: FONTS.RobotoBlack,
+  },
+
+  subLabel: {
+    fontSize: RFValue(12),
+    marginBottom: 20,
+    color: Colors.placeholderColor,
+    fontFamily: FONTS.RobotoRegular,
   },
   button: {
     backgroundColor: '#F7931E',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 25,
     marginTop: '10%',
   },
-  buttonText: {textAlign: 'center', color: '#fff', fontWeight: 'bold'},
+  buttonText: {
+    textAlign: 'center',
+    color: '#0D1318',
+    fontWeight: 'bold',
+  },
   image: {
-    width: screenWidth * 0.6,
-    height: screenHeight * 0.4,
+    width: '70%',
+    height: '45%',
     resizeMode: 'contain',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E6D6BC',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 8,
+    backgroundColor: Colors.bgcolor,
+  },
+
+  iconStyle: {
+    marginRight: 10,
+  },
+
+  inputWithIcon: {
+    flex: 1,
+    paddingVertical: 14,
+    fontSize: RFValue(12),
+    color: '#000',
+    backgroundColor: Colors.bgcolor,
+  },
+  err: {
+    fontSize: RFValue(10),
+    color: 'red',
+    marginLeft: 15,
   },
 });
 

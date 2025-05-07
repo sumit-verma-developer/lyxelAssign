@@ -27,6 +27,10 @@ export enum Colors {
   text = '#222',
   bgcolor = '#FAF1E6',
   green = '#00B300',
+  reddishbrown='#8E4441',
+  placeholderColor="#414141",
+ 
+
 }
 
 export const formatDate = (dateString: string): string => {
