@@ -1,13 +1,31 @@
-import React, {FC, useEffect, useState} from 'react';
-import {View, Text, FlatList, Image, StyleSheet, Alert} from 'react-native';
+import React, {FC, useCallback, useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  StyleSheet,
+  Alert,
+  ListRenderItem,
+} from 'react-native';
+import SubProductItem from '../components/SubProductItem';
 import API from '../services/api';
-import {Product} from '../types';
+import {Product, SectionedProduct} from '../types';
+import Loader from '../commons/Loader';
+import {Colors} from '../utils/Constants';
 
 const ProductScreen: FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<SectionedProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
+      setLoading(true);
+      // Fetch product list from API
       const productList = await API.post('products', {
         tabType: 'delivery',
         store_id: '27bb8b72-d0e7-4da1-9bf0-58dc802931d7',
@@ -20,35 +38,62 @@ const ProductScreen: FC = () => {
           'Successfully fetched products data',
         )
       ) {
-        setProducts(productList?.data?.data || []);
+        const sectioned = (
+          productList?.data?.data[0]?.sub_categories || []
+        ).map((section: any) => ({
+          title: section?.name,
+          data: section?.products,
+        }));
+
+        setProducts(sectioned || []);
       }
     } catch {
       Alert.alert('Failed to fetch products');
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
+  const renderSubItem: ListRenderItem<Product> = useCallback(({item}) => {
+    return <SubProductItem item={item} />;
   }, []);
 
-  const renderItem = ({item}: {item: Product}) => (
-    <View style={styles.card}>
-      <Image source={{uri: item.image_link}} style={styles.image} />
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.desc}>{item.description}</Text>
-      <Text style={styles.price}>₹ {item.delivery_price}</Text>
-    </View>
+  const renderSection: ListRenderItem<SectionedProduct> = useCallback(
+    ({item}) => {
+      return (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{item?.title}</Text>
+          <FlatList
+            data={item?.data}
+            renderItem={renderSubItem}
+            keyExtractor={item => item?.id?.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalList}
+            ItemSeparatorComponent={() => <View style={{width: 10}} />}
+          />
+        </View>
+      );
+    },
+    [renderSubItem],
   );
 
   return (
-    <View style={{backgroundColor: 'red'}}>
+    <View style={{backgroundColor: Colors.background}}>
       <FlatList
-        contentContainerStyle={styles.container}
         data={products}
-        numColumns={2}
-        renderItem={renderItem}
+        renderItem={renderSection}
         keyExtractor={(_, i) => i.toString()}
+        contentContainerStyle={styles.listContainer}
+        ItemSeparatorComponent={() => <View style={{height: 20}} />}
+        ListFooterComponent={<View style={{height: 30}} />}
+        showsVerticalScrollIndicator={false}
+        initialNumToRender={3}
+        maxToRenderPerBatch={5}
+        windowSize={10}
+        removeClippedSubviews
       />
+      <Loader loading={loading} />
     </View>
   );
 };
@@ -67,6 +112,27 @@ const styles = StyleSheet.create({
   title: {fontWeight: 'bold', marginTop: 5},
   desc: {fontSize: 12, color: '#777'},
   price: {marginTop: 5, color: '#F7931E', fontWeight: 'bold'},
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    marginBottom: 10,
+    color: '#6C3428',
+  },
+  listContainer: {
+    paddingVertical: 10,
+  },
+  section: {
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E6D6BC',
+    paddingBottom: 20,
+  },
+
+  horizontalList: {
+    paddingLeft: 10,
+    paddingRight: 5,
+  },
 });
 
 export default ProductScreen;

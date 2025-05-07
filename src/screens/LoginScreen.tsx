@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   Image,
+  KeyboardAvoidingView,
 } from 'react-native';
 import API from '../services/api';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -76,6 +77,7 @@ const LoginScreen: FC = () => {
   };
 
   return (
+    <KeyboardAvoidingView style={{flex: 1}} behavior="padding"> 
     <View style={styles.container}>
       <>
         <View style={{alignItems: 'center'}}>
@@ -93,7 +95,7 @@ const LoginScreen: FC = () => {
           </Text>
           <View style={styles.inputWrapper}>
             <MaterialCommunityIcons
-              name="phone"
+              name="phone-outline"
               size={22}
               color={Colors.placeholderColor}
               style={styles.iconStyle}
@@ -120,6 +122,7 @@ const LoginScreen: FC = () => {
       </>
       <Loader loading={loading} />
     </View>
+    </KeyboardAvoidingView>
   );
 };
 

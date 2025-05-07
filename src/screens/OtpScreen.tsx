@@ -1,5 +1,5 @@
 import React, {FC, useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {OtpInput} from 'react-native-otp-entry';
 import API from '../services/api';
@@ -24,8 +24,6 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
   const [timer, setTimer] = useState(60);
   const [otpResendDisabled, setOtpResendDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  console.log('mobile', mobile);
 
   useEffect(() => {
     if (timer === 0) {
@@ -83,9 +81,9 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
       setTimer(60);
       setOtpResendDisabled(true);
       try {
-        await API.post('otp-send', {mobile});
+        await API.post('login', {mobile});
         Alert.alert(
-          'OTP Sent',
+          'OTP  Resent',
           'A new OTP has been sent to your mobile number.',
         );
       } catch (e) {
@@ -95,6 +93,15 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
   };
 
   return (
+    <KeyboardAvoidingView
+    style={{flex: 1}}
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 50}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <ScrollView
+      contentContainerStyle={{flexGrow: 1,justifyContent: 'space-between'}}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled">
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.backButton}
@@ -167,6 +174,9 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
       </>
       <Loader loading={loading} />
     </View>
+    </ScrollView> 
+    </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

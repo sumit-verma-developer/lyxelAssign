@@ -8,6 +8,7 @@ import LoginScreen from '../screens/LoginScreen';
 import OtpScreen from '../screens/OtpScreen';
 import ProductScreen from '../screens/ProductScreen';
 import {navigationRef} from './NavigationUtils';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -24,12 +25,26 @@ const AppNavigator: FC = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-        }}
-      >
+        }}>
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="OTP" component={OtpScreen} />
-        <Stack.Screen name="Products" component={ProductScreen} />
+        <Stack.Screen
+          name="Products"
+          component={ProductScreen}
+          options={{
+            headerShown: true,
+            headerTitle: 'HOT BEVERAGE',
+            headerTintColor: 'black',
+            headerTitleStyle: {fontSize: RFValue(16),color: '#6C3428'},
+            headerTitleAlign: 'center',
+            headerStyle: {
+              backgroundColor: '#FFF1E6',
+            },
+            headerShadowVisible: true,
+            
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
