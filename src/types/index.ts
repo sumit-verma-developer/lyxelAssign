@@ -1,3 +1,4 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
   export interface Product {
     id: string;
@@ -22,3 +23,9 @@
     OTP: {mobile: string};
     Products: undefined;
   };
+
+  
+  export type LoginScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Login'
+>;

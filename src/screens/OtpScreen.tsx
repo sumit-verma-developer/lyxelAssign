@@ -20,6 +20,7 @@ import {Colors} from '../utils/Constants';
 import {RFValue} from 'react-native-responsive-fontsize';
 import Loader from '../commons/Loader';
 import {RootStackParamList} from '../types';
+import ScreenWrapper from '../commons/ScreenWrapper';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
 
@@ -96,10 +97,7 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{flex: 1}}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 50}>
+    <ScreenWrapper header={false}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={{flexGrow: 1, justifyContent: 'space-between'}}
@@ -179,7 +177,8 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </ScreenWrapper>
+   
   );
 };
 

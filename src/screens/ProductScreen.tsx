@@ -14,11 +14,11 @@ import {Product, SectionedProduct} from '../types';
 import Loader from '../commons/Loader';
 import {Colors} from '../utils/Constants';
 import {RFValue} from 'react-native-responsive-fontsize';
+import ScreenWrapper from '../commons/ScreenWrapper';
 
 const ProductScreen: FC = () => {
   const [products, setProducts] = useState<SectionedProduct[]>([]);
   const [loading, setLoading] = useState(false);
-  
 
   useEffect(() => {
     fetchData();
@@ -81,38 +81,41 @@ const ProductScreen: FC = () => {
   );
 
   return (
-    <View style={{backgroundColor: Colors.background, flex: 1}}>
-      <FlatList
-        data={products}
-        renderItem={renderSection}
-        keyExtractor={(_, i) => i.toString()}
-        contentContainerStyle={styles.listContainer}
-        ItemSeparatorComponent={() => <View style={{height: 20}} />}
-        ListFooterComponent={
-          products?.length === 0 ? (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingTop: '80%',
-              }}>
-              <Text style={styles.dataFoundText}>No Data Found</Text>
-            </View>
-          ) : null
-        }
-        showsVerticalScrollIndicator={false}
-        initialNumToRender={3}
-        maxToRenderPerBatch={5}
-        windowSize={10}
-        removeClippedSubviews
-      />
-      <Loader loading={loading} />
-    </View>
+    <ScreenWrapper header={false}>
+      <View style={styles.container}>
+        <FlatList
+          data={products}
+          renderItem={renderSection}
+          keyExtractor={(_, i) => i.toString()}
+          contentContainerStyle={styles.listContainer}
+          ItemSeparatorComponent={() => <View style={{height: 20}} />}
+          ListFooterComponent={
+            products?.length === 0 ? (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingTop: '80%',
+                }}>
+                <Text style={styles.dataFoundText}>No Data Found</Text>
+              </View>
+            ) : null
+          }
+          showsVerticalScrollIndicator={false}
+          initialNumToRender={3}
+          maxToRenderPerBatch={5}
+          windowSize={10}
+          removeClippedSubviews
+        />
+        <Loader loading={loading} />
+      </View>
+    </ScreenWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {padding: 10},
+  container: {backgroundColor: Colors.background, flex: 1},
+
   card: {
     backgroundColor: '#FFF1E6',
     borderRadius: 12,

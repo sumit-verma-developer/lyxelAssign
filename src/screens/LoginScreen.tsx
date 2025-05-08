@@ -18,15 +18,9 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Loader from '../commons/Loader';
 import {isValidPhoneNumber} from '../commons/isValidPhoneNumber';
-import { RootStackParamList } from '../types';
-
-//Define RootStackParamList 
-
-
-type LoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Login'
->;
+import {LoginScreenNavigationProp, RootStackParamList} from '../types';
+import {Screen} from 'react-native-screens';
+import ScreenWrapper from '../commons/ScreenWrapper';
 
 const LoginScreen: FC = () => {
   const [mobile, setMobile] = useState('');
@@ -75,54 +69,51 @@ const LoginScreen: FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}}
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 50}> 
-    <View style={styles.container}>
-      <>
-        <View style={{alignItems: 'center'}}>
-          <Image
-            source={require('../assets/images/logo.png')}
-            style={styles.image}
-          />
-          <Text style={styles.title}>WELCOME TO REACT-NATIVE WORLD</Text>
-        </View>
-
-        <View>
-          <Text style={styles.label}>SIGN IN</Text>
-          <Text style={styles.subLabel}>
-            Hi! Welcome back, you’ve been missed
-          </Text>
-          <View style={styles.inputWrapper}>
-            <MaterialCommunityIcons
-              name="phone-outline"
-              size={22}
-              color={Colors.placeholderColor}
-              style={styles.iconStyle}
+    <ScreenWrapper header={false}>
+      <View style={styles.container}>
+        <>
+          <View style={{alignItems: 'center'}}>
+            <Image
+              source={require('../assets/images/logo.png')}
+              style={styles.image}
             />
-            <TextInput
-              placeholder="Enter your mobile number..."
-              keyboardType="number-pad"
-              value={mobile}
-              onChangeText={setMobile}
-              style={styles.inputWithIcon}
-              placeholderTextColor={Colors.placeholderColor}
-              maxLength={10}
-            />
+            <Text style={styles.title}>WELCOME TO REACT-NATIVE WORLD</Text>
           </View>
-          {error?.mobile && <Text style={styles.err}>{error?.mobile}</Text>}
-        </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogin}
-          disabled={loading}>
-          <Text style={styles.buttonText}>PROCEED</Text>
-        </TouchableOpacity>
-      </>
-      <Loader loading={loading} />
-    </View>
-    </KeyboardAvoidingView>
+          <View>
+            <Text style={styles.label}>SIGN IN</Text>
+            <Text style={styles.subLabel}>
+              Hi! Welcome back, you’ve been missed
+            </Text>
+            <View style={styles.inputWrapper}>
+              <MaterialCommunityIcons
+                name="phone-outline"
+                size={22}
+                color={Colors.placeholderColor}
+                style={styles.iconStyle}
+              />
+              <TextInput
+                placeholder="Enter your mobile number..."
+                keyboardType="number-pad"
+                value={mobile}
+                onChangeText={setMobile}
+                style={styles.inputWithIcon}
+                placeholderTextColor={Colors.placeholderColor}
+                maxLength={10}
+              />
+            </View>
+            {error?.mobile && <Text style={styles.err}>{error?.mobile}</Text>}
+          </View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={loading}>
+            <Text style={styles.buttonText}>PROCEED</Text>
+          </TouchableOpacity>
+        </>
+        <Loader loading={loading} />
+      </View>
+    </ScreenWrapper>
   );
 };
 
