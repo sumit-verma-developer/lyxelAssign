@@ -17,13 +17,10 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Loader from '../commons/Loader';
 import {isValidPhoneNumber} from '../commons/isValidPhoneNumber';
+import { RootStackParamList } from '../types';
 
 //Define RootStackParamList 
-type RootStackParamList = {
-  Login: undefined;
-  OTP: {mobile: string};
-  Products: undefined;
-};
+
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,

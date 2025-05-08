@@ -16,3 +16,9 @@
  export interface ProductCardProps {
     item: Product;
   }
+
+   export type RootStackParamList = {
+    Login: undefined;
+    OTP: {mobile: string};
+    Products: undefined;
+  };

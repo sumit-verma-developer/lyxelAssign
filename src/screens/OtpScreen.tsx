@@ -1,5 +1,16 @@
 import React, {FC, useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, ScrollView, Platform, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {OtpInput} from 'react-native-otp-entry';
 import API from '../services/api';
@@ -8,12 +19,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {Colors} from '../utils/Constants';
 import {RFValue} from 'react-native-responsive-fontsize';
 import Loader from '../commons/Loader';
-
-type RootStackParamList = {
-  Login: undefined;
-  OTP: {mobile: string};
-  Products: undefined;
-};
+import {RootStackParamList} from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OTP'>;
 
@@ -27,7 +33,7 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
 
   useEffect(() => {
     if (timer === 0) {
-      setOtpResendDisabled(false); // Enable resend when timer hits 0
+      setOtpResendDisabled(false);
       return;
     }
 
@@ -53,13 +59,10 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
     try {
       setLoading(true);
       const verifyResult = await API.post('otp-verify', {mobile, otp});
-      console.log('verifyResult', verifyResult);
-
       if (verifyResult?.status == 200) {
         if (verifyResult?.data?.token) {
           saveToken(verifyResult?.data?.token);
           navigation.navigate('Products');
-          
         } else {
           setError('Invalid OTP. Please try again.');
         }
@@ -94,88 +97,88 @@ const OtpScreen: FC<Props> = ({route, navigation}) => {
 
   return (
     <KeyboardAvoidingView
-    style={{flex: 1}}
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 50}>
+      style={{flex: 1}}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 50}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <ScrollView
-      contentContainerStyle={{flexGrow: 1,justifyContent: 'space-between'}}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled">
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}>
-        <MaterialCommunityIcons
-          name="arrow-left"
-          size={30}
-          color={Colors.placeholderColor}
-        />
-      </TouchableOpacity>
-      <>
-        <Text style={styles.title}>ALMOST READY TO</Text>
-        <Text style={styles.titleBold}>POUR!</Text>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1, justifyContent: 'space-between'}}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.container}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}>
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={30}
+                color={Colors.placeholderColor}
+              />
+            </TouchableOpacity>
+            <>
+              <Text style={styles.title}>ALMOST READY TO</Text>
+              <Text style={styles.titleBold}>POUR!</Text>
 
-        <Text style={styles.subtitle}>
-          Please enter the OTP sent to your{'\n'}mobile no. +91
-          {mobile.slice(-10).replace(/(\d{2})\d{6}(\d{2})/, '$1******$2')}
-        </Text>
+              <Text style={styles.subtitle}>
+                Please enter the OTP sent to your{'\n'}mobile no. +91
+                {mobile.slice(-10).replace(/(\d{2})\d{6}(\d{2})/, '$1******$2')}
+              </Text>
 
-        <OtpInput
-          numberOfDigits={4}
-          focusColor="#F7931E"
-          onTextChange={text => {
-            setOtp(text);
-            setError('');
-          }}
-          textInputProps={{
-            keyboardType: 'number-pad',
-            maxLength: 4,
-          }}
-          theme={{
-            containerStyle: styles.otpContainer,
-            pinCodeContainerStyle: styles.otpBox,
-            pinCodeTextStyle: styles.otpText,
-          }}
-        />
+              <OtpInput
+                numberOfDigits={4}
+                focusColor="#F7931E"
+                onTextChange={text => {
+                  setOtp(text);
+                  setError('');
+                }}
+                textInputProps={{
+                  keyboardType: 'number-pad',
+                  maxLength: 4,
+                }}
+                theme={{
+                  containerStyle: styles.otpContainer,
+                  pinCodeContainerStyle: styles.otpBox,
+                  pinCodeTextStyle: styles.otpText,
+                }}
+              />
 
-        {errorr !== '' && <Text style={styles.errorText}>{errorr}</Text>}
+              {errorr !== '' && <Text style={styles.errorText}>{errorr}</Text>}
 
-        <Text style={styles.timerText}>
-          Resend code in{' '}
-          <Text style={styles.timerCountdown}>
-            00:{timer < 10 ? `0${timer}` : timer}
-          </Text>
-        </Text>
-        {timer == 0 && (
-          <TouchableOpacity
-            style={[
-              {
-                alignItems: 'center',
-                paddingBottom: 20,
-                width: 120,
-                marginBottom: 30,
-                justifyContent: 'center',
-                alignSelf: 'center',
-              },
-              otpResendDisabled && {opacity: 0.5},
-            ]}
-            onPress={handleResendOtp}
-            disabled={otpResendDisabled}>
-            <Text style={[styles.buttonText, {color: '#456de6'}]}>
-              Resend OTP
-            </Text>
-          </TouchableOpacity>
-        )}
+              <Text style={styles.timerText}>
+                Resend code in{' '}
+                <Text style={styles.timerCountdown}>
+                  00:{timer < 10 ? `0${timer}` : timer}
+                </Text>
+              </Text>
+              {timer == 0 && (
+                <TouchableOpacity
+                  style={[
+                    {
+                      alignItems: 'center',
+                      paddingBottom: 20,
+                      width: 120,
+                      marginBottom: 30,
+                      justifyContent: 'center',
+                      alignSelf: 'center',
+                    },
+                    otpResendDisabled && {opacity: 0.5},
+                  ]}
+                  onPress={handleResendOtp}
+                  disabled={otpResendDisabled}>
+                  <Text style={[styles.buttonText, {color: '#456de6'}]}>
+                    Resend OTP
+                  </Text>
+                </TouchableOpacity>
+              )}
 
-        <TouchableOpacity style={styles.button} onPress={handleVerify}>
-          <Text style={styles.buttonText}>VERIFY</Text>
-        </TouchableOpacity>
-      </>
-      <Loader loading={loading} />
-    </View>
-    </ScrollView> 
-    </TouchableWithoutFeedback>
+              <TouchableOpacity style={styles.button} onPress={handleVerify}>
+                <Text style={styles.buttonText}>VERIFY</Text>
+              </TouchableOpacity>
+            </>
+            <Loader loading={loading} />
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };
@@ -190,17 +193,17 @@ const styles = StyleSheet.create({
     paddingTop: '20%',
   },
   title: {
-    fontSize: 22,
+    fontSize: RFValue(18),
     color: '#6C3428',
     fontWeight: '600',
   },
   titleBold: {
-    fontSize: 22,
+    fontSize:RFValue(18),
     color: '#6C3428',
     fontWeight: '800',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize:RFValue(12),
     marginTop: 15,
     color: '#444',
     lineHeight: 20,
@@ -218,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   otpText: {
-    fontSize: 20,
+    fontSize:RFValue(16),
     fontWeight: '600',
   },
   errorText: {
@@ -228,7 +231,7 @@ const styles = StyleSheet.create({
   },
   timerText: {
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: RFValue(12),
     color: '#333',
     marginBottom: 30,
   },

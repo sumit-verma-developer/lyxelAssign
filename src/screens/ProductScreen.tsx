@@ -13,10 +13,12 @@ import API from '../services/api';
 import {Product, SectionedProduct} from '../types';
 import Loader from '../commons/Loader';
 import {Colors} from '../utils/Constants';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 const ProductScreen: FC = () => {
   const [products, setProducts] = useState<SectionedProduct[]>([]);
   const [loading, setLoading] = useState(false);
+  
 
   useEffect(() => {
     fetchData();
@@ -79,14 +81,25 @@ const ProductScreen: FC = () => {
   );
 
   return (
-    <View style={{backgroundColor: Colors.background}}>
+    <View style={{backgroundColor: Colors.background, flex: 1}}>
       <FlatList
         data={products}
         renderItem={renderSection}
         keyExtractor={(_, i) => i.toString()}
         contentContainerStyle={styles.listContainer}
         ItemSeparatorComponent={() => <View style={{height: 20}} />}
-        ListFooterComponent={<View style={{height: 30}} />}
+        ListFooterComponent={
+          products?.length === 0 ? (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingTop: '80%',
+              }}>
+              <Text style={styles.dataFoundText}>No Data Found</Text>
+            </View>
+          ) : null
+        }
         showsVerticalScrollIndicator={false}
         initialNumToRender={3}
         maxToRenderPerBatch={5}
@@ -108,12 +121,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  image: {width: 100, height: 100, borderRadius: 10},
   title: {fontWeight: 'bold', marginTop: 5},
-  desc: {fontSize: 12, color: '#777'},
+  desc: {fontSize: RFValue(10), color: '#777'},
   price: {marginTop: 5, color: '#F7931E', fontWeight: 'bold'},
   sectionTitle: {
-    fontSize: 18,
+    fontSize: RFValue(16),
     fontWeight: 'bold',
     marginLeft: 10,
     marginBottom: 10,
@@ -132,6 +144,11 @@ const styles = StyleSheet.create({
   horizontalList: {
     paddingLeft: 10,
     paddingRight: 5,
+  },
+  dataFoundText: {
+    fontSize: RFValue(14),
+    color: '#E6D6BC',
+    textAlign: 'center',
   },
 });
 

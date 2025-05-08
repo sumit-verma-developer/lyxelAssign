@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgcolor,
   },
   image: {
-    width: screenWidth*.6,
-    height: screenHeight*.6,
+    width: screenWidth * 0.6,
+    height: screenHeight * 0.6,
     resizeMode: 'contain',
   },
 });
