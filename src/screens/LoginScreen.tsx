@@ -8,6 +8,7 @@ import {
   Alert,
   Image,
   KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import API from '../services/api';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -74,7 +75,9 @@ const LoginScreen: FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior="padding"> 
+    <KeyboardAvoidingView style={{flex: 1}}
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 50}> 
     <View style={styles.container}>
       <>
         <View style={{alignItems: 'center'}}>
